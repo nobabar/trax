@@ -10,11 +10,12 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Frame extends JPanel implements TileButtonObserver{
+public class Frame extends JPanel implements TileButtonObserver, PanelButtonObserver{
+	public static final long serialVersionUID = 6181135L;
+	
 	Colors turn = Colors.W;
 	JLabel turnLabel = new JLabel("White's turn");
-	
-	public static final long serialVersionUID = 6181135L;
+	PanelButton current;
 	
 	public void notify(boolean success) {
 		if (success) {
@@ -33,9 +34,14 @@ public class Frame extends JPanel implements TileButtonObserver{
 		}
 	}
 
+	public void setCurrent(PanelButton tile) {
+		this.current = tile;
+	}
+	
 	public Frame() {
 		int ntiles = 15;
 		int tilesize = 50;
+		
 		Board b = new Board(ntiles, tilesize, this);
 		b.setBackground(Color.BLACK);
 		this.add(b);
@@ -50,13 +56,13 @@ public class Frame extends JPanel implements TileButtonObserver{
 
 		int buttonSize = 100;
 
-		leftbox.add(new PanelButton(new Tiles(TileModel.CROSS, 0), buttonSize));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CROSS, 1), buttonSize));
+		leftbox.add(new PanelButton(new Tiles(TileModel.CROSS, 0), buttonSize, this));
+		rightbox.add(new PanelButton(new Tiles(TileModel.CROSS, 1), buttonSize, this));
 
-		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 0), buttonSize));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 3), buttonSize));
-		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 2), buttonSize));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 1), buttonSize));
+		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 0), buttonSize, this));
+		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 3), buttonSize, this));
+		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 2), buttonSize, this));
+		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 1), buttonSize, this));
 
 		ActionListener clearAL = new ActionListener () {
 			public void actionPerformed (ActionEvent e) {

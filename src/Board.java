@@ -10,7 +10,7 @@ class Board extends JPanel {
 	TileButton[][] buttonGrid;
 	
 	public static final long serialVersionUID = 2151184L;
-	
+		
 	public Board(int ntiles, int tilesize, TileButtonObserver tbo) {
 		this.ntiles = ntiles;
 		this.tilesize = tilesize;

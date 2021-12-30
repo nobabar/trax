@@ -72,11 +72,13 @@ abstract class Button extends JButton{
 }
 
 class PanelButton extends Button {
-	
 	public static final long serialVersionUID = 1611451222120201514L;
 	
-	public PanelButton(Tiles tile, int cSize) {
+	PanelButtonObserver pbo;
+	
+	public PanelButton(Tiles tile, int cSize, PanelButtonObserver pbo) {
 		super (tile, cSize);
+		this.pbo = pbo;
 		this.setIcon(tile.toIcon());
 		ActionListener al = new ActionListener() {
 			public void actionPerformed (ActionEvent e) {
@@ -90,10 +92,9 @@ class PanelButton extends Button {
 }
 
 class TileButton extends Button {
-	int nbTiles = 0;
-	
 	public static final long serialVersionUID = 20912522120201514L;
 	
+	int nbTiles = 0;
 	TileButton[][] buttonGrid;
 	TileButtonObserver tbo;
 
