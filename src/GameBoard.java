@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.awt.Color;
 import javax.swing.border.LineBorder;
 
@@ -66,16 +67,14 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 			if (playedTiles == 0 || testConformity(bt, current.tile)) {
 				bt.setTile(current.tile);
 				playedTiles++;
-				if (isGameOver(bt)) {
-					GO.win(true);
-				}
+				isGameOver(bt);
 			}
 			current.setBorder(new LineBorder(Color.WHITE));
 			current = null;
 		}
 	}
 
-	int[] getCoordinates(BoardTile bt) {
+	private int[] getCoordinates(BoardTile bt) {
 		for (int row = 0; row < boardGrid.length; row++) {
 			for (int col = 0; col < boardGrid[0].length; col++) {
 				if (boardGrid[row][col] == bt) {
@@ -86,7 +85,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		return null;
 	}
 
-	Tiles adjacentTile(int[] coordinates, Directions dir) {
+	private Tiles adjacentTile(int[] coordinates, Directions dir) {
 		int row = coordinates[0]+dir.motion(0);
 		int col = coordinates[1]+dir.motion(1);
 		if (row >= 0 && row < ntiles && col >= 0 && col < ntiles) {
@@ -98,7 +97,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		return null;
 	}
 
-	boolean testConformity(BoardTile bt, Tiles tile) {
+	private boolean testConformity(BoardTile bt, Tiles tile) {
 		boolean conform = true;
 		boolean neighbor = false;
 		int[] coordinates = getCoordinates(bt);
@@ -116,19 +115,22 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		return (conform && neighbor);
 	}
 
-	boolean isGameOver(BoardTile bt) {
+	private void isGameOver(BoardTile bt) {
 		if (playedTiles >= 4) {
-			Directions[] dir = bt.getPath(turn);
-			int firstPath = isLine(bt, dir[0]);
-			int secondPath = isLine(bt, dir[1]);
-			if (firstPath + secondPath + 1 >= 7) {
-				return true;
-			}
+			for (Colors col : new Colors[] {turn, turn.opposite()}) {
+				Directions[] dir = bt.getPath(col);
+				int firstPath = dichotomyGO(bt, dir[0]);
+				int secondPath = dichotomyGO(bt, dir[1]);
+				if ((firstPath == -1 && secondPath == -1) 
+						|| (firstPath + secondPath + 1 >= 7)) {
+					GO.win(col);
+					return;
+				}
+			}	
 		}
-		return false;
 	}
 
-	int isLine(BoardTile bt, Directions dir) {
+	private int dichotomyGO(BoardTile bt, Directions dir) {
 		int[] coordinates = getCoordinates(bt);
 		int row = coordinates[0] + dir.motion(0);
 		int col = coordinates[1] + dir.motion(1);
@@ -141,15 +143,14 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 					nextDir = nextTile.getPath(nextDir.opposite());
 					row += nextDir.motion(0);
 					col += nextDir.motion(1);
+					if (Arrays.equals(new int[] {row, col}, coordinates)) {
+						return -1;
+					}
 					length ++;
 					continue;
 				}
 			}
 			return length;
 		}
-	}
-
-	void isLoop(BoardTile bt, Directions dir) {
-
 	}
 }

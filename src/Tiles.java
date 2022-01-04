@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tiles {
 	private TileModel model;
 	private Directions orientation;
@@ -41,20 +44,37 @@ public class Tiles {
 		this.model = null;
 	}
 	
+	public Colors[] colArray() {
+		return model.colArray(this.orientation);
+	}
+	
 	public Colors getColor(Directions dir) {
-		return model.colArray(orientation)[dir.ordinal()];
+		return colArray()[dir.ordinal()];
 	}
 	
 	public Colors getColor(int dir) {
-		return model.getColor((dir+orientation.ordinal())%4);
+		return colArray()[dir];
 	}
 	
-	public Directions getPath(Directions dir) {
-		return model.getPath(orientation.ordinal(), dir);
+	public Directions getPath(Directions dir) {		
+		Colors col = getColor(dir);
+		for (int side = 0; side < 4; side++) {
+			if (side != dir.ordinal() && colArray()[side] == col) {
+				return Directions.values()[side];
+			}
+		}
+		return null;
 	}
 	
 	public Directions[] getPath(Colors col) {
-		return model.getPath(orientation.ordinal(), col);
+		List<Directions> sideList = new ArrayList<>();
+		for (int side = 0; side < 4; side++) {
+			if (colArray()[side] == col) {
+				sideList.add(Directions.values()[side]);
+			}		
+		}
+		Directions[] sideArray = sideList.toArray(new Directions[0]);
+		return sideArray;
 	}
 }
 

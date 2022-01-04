@@ -1,3 +1,3 @@
 public interface GameObserver {
-	void win(boolean state);
+	void win(Colors winner);
 }

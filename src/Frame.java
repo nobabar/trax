@@ -37,10 +37,8 @@ public class Frame extends JPanel implements GameObserver{
 		}
 	}
 
-	public void win(boolean state) {
-		if (state) {
-			turnLabel.setText("WIN!!");
-		}
+	public void win(Colors winner) {
+		turnLabel.setText("Joueur " + winner + " a gagné !");
 	}
 	
 	public Frame(GameBoard GB) {
