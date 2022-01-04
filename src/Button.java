@@ -15,7 +15,6 @@ import javax.swing.border.LineBorder;
 abstract class Button extends JButton{
 	Tiles tile;
 	int cSize;
-	static PanelButton current;
 
 	static BufferedImage cross;
 	static BufferedImage curve;
@@ -39,9 +38,9 @@ abstract class Button extends JButton{
 	protected void paintComponent (Graphics g) {
 		Graphics2D g2 = (Graphics2D)g.create();
 
-		if (tile != null) {
+		if (tile.getModel() != null) {
 			int rotation = 0;
-			switch (tile.orientation) {
+			switch (tile.getOrientation()) {
 			case 0:
 				break;
 			case 1:
@@ -56,7 +55,7 @@ abstract class Button extends JButton{
 			}
 
 			BufferedImage image = null;
-			switch (tile.model) {
+			switch (tile.getModel()) {
 			case CROSS:
 				image = cross;
 				break;
@@ -76,13 +75,12 @@ class PanelButton extends Button {
 	
 	PanelButtonObserver pbo;
 	
-	public PanelButton(Tiles tile, int cSize, PanelButtonObserver pbo) {
-		super (tile, cSize);
+	public PanelButton(int cSize, PanelTile pt, PanelButtonObserver pbo) {
+		super (pt, cSize);
 		this.pbo = pbo;
-		this.setIcon(tile.toIcon());
 		ActionListener al = new ActionListener() {
 			public void actionPerformed (ActionEvent e) {
-				current = PanelButton.this;
+				pbo.setCurrent(PanelButton.this);
 				PanelButton.this.setBorder(new LineBorder(Color.BLUE, 2));
 			}
 		};
@@ -91,89 +89,22 @@ class PanelButton extends Button {
 	}
 }
 
-class TileButton extends Button {
+class BoardButton extends Button {
 	public static final long serialVersionUID = 20912522120201514L;
 	
-	int nbTiles = 0;
-	TileButton[][] buttonGrid;
-	TileButtonObserver tbo;
-
-	public TileButton(TileButton[][] buttonGrid, int cSize, TileButtonObserver tbo) {
-		super (null, cSize);
+	BoardButtonObserver tbo;
+	
+	public BoardButton(int cSize, BoardTile bt, BoardButtonObserver tbo) {
+		super (bt, cSize);
 		this.tbo = tbo;
-		this.buttonGrid = buttonGrid;
 		ActionListener al = new ActionListener() {
 			public void actionPerformed (ActionEvent e) {
-				if (!TileButton.this.testConformity(current.tile)
-						|| TileButton.this.tile != null
-						|| current == null) {
-					tbo.notify(false);
-					current.setBorder(new LineBorder(Color.WHITE));
-					current = null;
-					return;
+				if(bt.getModel() == null) {
+					tbo.playTile(bt);
 				}
-				TileButton.this.tile = current.tile;
-				nbTiles++;
-				current.setBorder(new LineBorder(Color.WHITE));
-				current = null;
-				tbo.notify(true);
 			}
 		};
 		this.addActionListener(al);
 		this.setPreferredSize(new Dimension(80,80));
 	}
-
-	int[] getCoordinates() {
-		for (int row = 0; row < buttonGrid.length; row++) {
-			for (int col = 0; col < buttonGrid[0].length; col++) {
-				if (buttonGrid[row][col] == this) {
-					return new int[]{row, col};
-				}
-			}
-		}
-		return null;
-	}
-
-	Tiles adjacentTile(int[] coordinates, Directions dir) {
-		int[][] side = {
-				{-1, 0},
-				{0, 1},
-				{1, 0},
-				{0, -1}
-		};
-		int row = coordinates[0]+side[dir.ordinal()][0];
-		int col = coordinates[1]+side[dir.ordinal()][1];
-		if (row >= 0 && col >= 0) {
-			Tiles tile = buttonGrid[row][col].tile;
-			return tile;
-		} else {
-			return null;
-		}
-	}
-
-	boolean testConformity(Tiles tile) {
-		boolean conform = true;
-		boolean neighbor = false;
-		int[] coordinates = this.getCoordinates();
-		for (Directions dir : Directions.values()) {
-			Colors tileColor = tile.getColor(dir.ordinal());
-			Tiles neighborTile = adjacentTile(coordinates, dir);
-			if (neighborTile != null) {
-				neighbor = true;
-				Colors neighborColor = neighborTile.getColor((dir.ordinal()+2)%4);
-				if (tileColor != neighborColor) {
-					conform = false;
-				}
-			}
-		}
-		return (conform && neighbor);
-	}
-	
-	public Colors isGameOver(TileButton TB)
-    {
-        if (TB.nbTiles < 5) {
-            return null;
-        }
-        return Colors.W;
-    }
 }

@@ -1,5 +1,4 @@
 import javax.swing.JPanel;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -7,16 +6,20 @@ import javax.swing.JButton;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class Frame extends JPanel implements TileButtonObserver, PanelButtonObserver{
+public class Frame extends JPanel implements GameObserver{
 	public static final long serialVersionUID = 6181135L;
-	
+
+	BoardButton[][] boardGrid;
+	PanelButton[][] panelGrid;
+
 	Colors turn = Colors.W;
 	JLabel turnLabel = new JLabel("White's turn");
-	PanelButton current;
-	
+
 	public void notify(boolean success) {
 		if (success) {
 			switch (turn) {
@@ -34,58 +37,62 @@ public class Frame extends JPanel implements TileButtonObserver, PanelButtonObse
 		}
 	}
 
-	public void setCurrent(PanelButton tile) {
-		this.current = tile;
+	public void win(boolean state) {
+		if (state) {
+			turnLabel.setText("WIN!!");
+		}
 	}
 	
-	public Frame() {
-		int ntiles = 15;
-		int tilesize = 50;
+	public Frame(GameBoard GB) {
+		int nBoardTiles = GB.ntiles;
 		
-		Board b = new Board(ntiles, tilesize, this);
+		Dimension DimMax = Toolkit.getDefaultToolkit().getScreenSize();
+		int BoardButtonSize = ((int) Math.round(DimMax.height*0.75))/nBoardTiles;
+		
+		this.boardGrid = new BoardButton[nBoardTiles][nBoardTiles];
+		for (int row = 0; row < nBoardTiles; row++) {
+			for (int col = 0; col < nBoardTiles; col++) {
+				BoardButton button = new BoardButton(BoardButtonSize, 
+						GB.boardGrid[row][col], GB);
+				boardGrid[row][col] = button;
+				button.setPreferredSize(new Dimension(nBoardTiles, nBoardTiles));
+			}
+		}
+		Board b = new Board(boardGrid, BoardButtonSize);
 		b.setBackground(Color.BLACK);
 		this.add(b);
 
 		Box superbox = new Box(BoxLayout.Y_AXIS);
-		Box tilebox = new Box(BoxLayout.X_AXIS);
-		Box leftbox = new Box(BoxLayout.Y_AXIS);
-		Box rightbox = new Box(BoxLayout.Y_AXIS);
-		superbox.add(tilebox);
-		tilebox.add(leftbox);
-		tilebox.add(rightbox);
+		
+		int PanelButtonSize = 100;
+		int nRow = GB.panelGrid.length;
+		int nCol = GB.panelGrid[0].length;
+		JPanel p = new JPanel(new GridLayout(nRow, nCol));
+		this.panelGrid = new PanelButton[nRow][nCol];
+		for (int row = 0; row < nRow; row++) {
+			for (int col = 0; col < nCol; col++) {
+				panelGrid[row][col] = new PanelButton(PanelButtonSize, 
+						GB.panelGrid[row][col], GB);
+				p.add(panelGrid[row][col]);
+			}
+		}
+		superbox.add(p);
 
-		int buttonSize = 100;
-
-		leftbox.add(new PanelButton(new Tiles(TileModel.CROSS, 0), buttonSize, this));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CROSS, 1), buttonSize, this));
-
-		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 0), buttonSize, this));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 3), buttonSize, this));
-		leftbox.add(new PanelButton(new Tiles(TileModel.CURVE, 2), buttonSize, this));
-		rightbox.add(new PanelButton(new Tiles(TileModel.CURVE, 1), buttonSize, this));
-
+		Box toolbox = new Box(BoxLayout.X_AXIS);
 		ActionListener clearAL = new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
 				b.clear();
 			}
 		};
 		JButton clear = new JButton("clear");
-		clear.setPreferredSize(new Dimension(60, 120));
+		clear.setPreferredSize(new Dimension(60, 40));
 		clear.addActionListener(clearAL);
-		superbox.add(clear);
+		toolbox.add(clear);
 
-		superbox.add(turnLabel);
+		toolbox.add(turnLabel);
 
+		superbox.add(toolbox);
 		this.add(superbox);
 		this.repaint();
-	}
-
-	public static void main(String[] args) {
-		Frame f = new Frame();
-		JFrame frame = new JFrame("Jimp");
-		frame.getContentPane().add(f);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.pack();
-		frame.setVisible(true);	
 	}
 }

@@ -1,79 +1,77 @@
-import javax.swing.ImageIcon;
-
-enum Directions {
-	N,
-	E,
-	S,
-	W;
-}
-
-enum Sides {
-	U,
-	R,
-	D,
-	L;
-}
-
-enum Colors {
-	W,
-	R;
-}
-
-enum TileModel {
-	CROSS,
-	CURVE;
-	
-	int rotation;
-	static Colors[][] color = {
-			{Colors.W, Colors.R, Colors.W, Colors.R},
-			{Colors.W, Colors.R, Colors.R, Colors.W}
-	};
-	static ImageIcon icon_cross = new ImageIcon(".\\img\\tile_cross.gif");
-	static ImageIcon icon_curve = new ImageIcon(".\\img\\tile_curve.gif");
-	static RotateIcon[][] icon = {
-			{new RotateIcon(icon_cross, Rotate.UP),
-				new RotateIcon(icon_cross, Rotate.LEFT),
-				new RotateIcon(icon_cross, Rotate.DOWN),
-				new RotateIcon(icon_cross, Rotate.RIGHT)},
-			{new RotateIcon(icon_curve, Rotate.UP),
-				new RotateIcon(icon_curve, Rotate.LEFT),
-				new RotateIcon(icon_curve, Rotate.DOWN),
-				new RotateIcon(icon_curve, Rotate.RIGHT)}
-	};
-	
-	public String Show(int orientation) {
-		return "--"+color[ordinal()][(Directions.N.ordinal()+orientation)%4]+"--\n"+
-				color[ordinal()][(Directions.W.ordinal()+orientation)%4]+"---"+color[ordinal()][(Directions.E.ordinal()+orientation)%4]+"\n"+
-			   "--"+color[ordinal()][(Directions.S.ordinal()+orientation)%4]+"--";
-	}
-	
-	public RotateIcon getIcon(int orientation) {
-		return icon[ordinal()][orientation];
-	}
-}
-
 public class Tiles {
-	TileModel model;
-	int orientation;
+	private TileModel model;
+	private Directions orientation;
 	
-	public Tiles(TileModel model, int orientation) {
+	public Tiles() {}
+	
+	public Tiles(TileModel model, Directions orientation) {
 		this.model = model;
 		this.orientation = orientation;
 	}
 	
+	public Tiles(TileModel model, int orientation) {
+		this.model = model;
+		this.orientation = Directions.values()[orientation];
+	}
+	
 	public Tiles(Tiles tile) {
-		
+		this.model = tile.model;
+		this.orientation = tile.orientation;
 	}
 	
-	public String toString() {
-		return model.Show(orientation);
+	public void setTile(TileModel model, Directions orientation) {
+		this.model = model;
+		this.orientation = orientation;
 	}
 	
-	public RotateIcon toIcon() {
-		return model.getIcon(orientation);
+	public void setTile(Tiles tile) {
+		this.model = tile.model;
+		this.orientation = tile.orientation;
+	}
+	
+	public TileModel getModel() {
+		return this.model;
+	}
+	
+	public int getOrientation() {
+		return this.orientation.ordinal();
+	}
+	
+	public void clear() {
+		this.model = null;
+	}
+	
+	public Colors getColor(Directions dir) {
+		return model.colArray(orientation)[dir.ordinal()];
 	}
 	
 	public Colors getColor(int dir) {
-		return model.color[model.ordinal()][(dir+orientation)%4];
+		return model.getColor((dir+orientation.ordinal())%4);
+	}
+	
+	public Directions getPath(Directions dir) {
+		return model.getPath(orientation.ordinal(), dir);
+	}
+	
+	public Directions[] getPath(Colors col) {
+		return model.getPath(orientation.ordinal(), col);
+	}
+}
+
+class PanelTile extends Tiles {
+	PanelButtonObserver pbo;
+	
+	public PanelTile(TileModel model, Directions dir, PanelButtonObserver pbo) {
+		super (model, dir);
+		this.pbo = pbo;
+	}
+}
+
+class BoardTile extends Tiles {
+	BoardButtonObserver bbo;
+
+	public BoardTile(BoardButtonObserver bbo) {
+		super ();
+		this.bbo = bbo;
 	}
 }
