@@ -3,6 +3,8 @@ import javax.swing.JLabel;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -17,28 +19,34 @@ public class Frame extends JPanel implements GameObserver{
 	BoardButton[][] boardGrid;
 	PanelButton[][] panelGrid;
 
-	Colors turn = Colors.W;
-	JLabel turnLabel = new JLabel("White's turn");
+	JLabel turnLabel = new JLabel("Tour du joueur blanc");
 
-	public void notify(boolean success) {
-		if (success) {
-			switch (turn) {
-			case W:
-				turnLabel.setText("Red's turn");	
-				turn = Colors.R;
-				break;
-			case R:
-				turnLabel.setText("White's turn");
-				turn = Colors.W;
-				break;
-			}
+	public void nextturn(Colors player) {
+		if (player != null) {
+			turnLabel.setText("Tour du joueur "+player);	
 		} else {
-			turnLabel.setText("Invalid tile");
+			turnLabel.setText("Tuile invalide!");
 		}
 	}
 
 	public void win(Colors winner) {
-		turnLabel.setText("Joueur " + winner + " a gagné !");
+		String[] options = new String[] {"Oui", "Non", "Nouveau plateau"};
+		int response = JOptionPane.showOptionDialog(null, "Joueur " + winner + " a gagné !\nNouvelle partie ?",
+		        "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+		        null, options, options[0]);
+		switch (response) {
+		case 0:
+			Game.clear();
+			repaint();
+			break;
+		case 1:
+			System.exit(0);
+			break;
+		case 2:
+			SwingUtilities.getWindowAncestor(this).dispose();
+			Game.launch();
+			break;
+		}
 	}
 	
 	public Frame(GameBoard GB) {
@@ -53,7 +61,6 @@ public class Frame extends JPanel implements GameObserver{
 				BoardButton button = new BoardButton(BoardButtonSize, 
 						GB.boardGrid[row][col], GB);
 				boardGrid[row][col] = button;
-				button.setPreferredSize(new Dimension(nBoardTiles, nBoardTiles));
 			}
 		}
 		Board b = new Board(boardGrid, BoardButtonSize);
@@ -61,36 +68,43 @@ public class Frame extends JPanel implements GameObserver{
 		this.add(b);
 
 		Box superbox = new Box(BoxLayout.Y_AXIS);
-		
 		int PanelButtonSize = 100;
 		int nRow = GB.panelGrid.length;
 		int nCol = GB.panelGrid[0].length;
-		JPanel p = new JPanel(new GridLayout(nRow, nCol));
+
+		JPanel p = new JPanel();
+		p.setPreferredSize(new Dimension(PanelButtonSize*2, PanelButtonSize*3));
+		p.setLayout(new GridLayout(nRow, nCol));
+		
 		this.panelGrid = new PanelButton[nRow][nCol];
 		for (int row = 0; row < nRow; row++) {
 			for (int col = 0; col < nCol; col++) {
-				panelGrid[row][col] = new PanelButton(PanelButtonSize, 
+				PanelButton button = new PanelButton(PanelButtonSize, 
 						GB.panelGrid[row][col], GB);
-				p.add(panelGrid[row][col]);
+				panelGrid[row][col] = button;
+				p.add(button);
 			}
 		}
 		superbox.add(p);
 
-		Box toolbox = new Box(BoxLayout.X_AXIS);
 		ActionListener clearAL = new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
-				b.clear();
+				Game.clear();
+				repaint();
 			}
 		};
 		JButton clear = new JButton("clear");
-		clear.setPreferredSize(new Dimension(60, 40));
+		clear.setPreferredSize(new Dimension(80, 40));
 		clear.addActionListener(clearAL);
-		toolbox.add(clear);
+		
+		JPanel helperPanelClear = new JPanel();
+		helperPanelClear.add(clear);
+		superbox.add(helperPanelClear);
 
-		toolbox.add(turnLabel);
-
-		superbox.add(toolbox);
+		JPanel helperPanelLabel = new JPanel();
+		helperPanelLabel.add(turnLabel);
+		superbox.add(helperPanelLabel);
+		
 		this.add(superbox);
-		this.repaint();
 	}
 }

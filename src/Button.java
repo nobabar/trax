@@ -30,6 +30,7 @@ abstract class Button extends JButton{
 	public Button(Tiles tile, int cSize) {
 		this.tile = tile;
 		this.cSize = cSize;
+		this.setPreferredSize(new Dimension(cSize, cSize));
 		this.setContentAreaFilled(false);
 		this.setFocusPainted(false);
 		this.setBorder(new LineBorder(Color.WHITE));
@@ -81,11 +82,10 @@ class PanelButton extends Button {
 		ActionListener al = new ActionListener() {
 			public void actionPerformed (ActionEvent e) {
 				pbo.setCurrent(PanelButton.this);
-				PanelButton.this.setBorder(new LineBorder(Color.BLUE, 2));
+				PanelButton.this.setBorder(new LineBorder(Color.RED));
 			}
 		};
 		this.addActionListener(al);
-		this.setPreferredSize(new Dimension(100,100));
 	}
 }
 
@@ -105,6 +105,5 @@ class BoardButton extends Button {
 			}
 		};
 		this.addActionListener(al);
-		this.setPreferredSize(new Dimension(80,80));
 	}
 }

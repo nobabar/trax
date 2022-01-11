@@ -13,8 +13,6 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 	PanelButton current;
 	Colors turn = Colors.W;
 
-	boolean illegalMove = false;
-
 	public GameBoard(int ntiles) {		
 		panelGrid = new PanelTile[][] {
 			{new PanelTile(TileModel.CROSS, Directions.N, this),
@@ -35,6 +33,15 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 			}
 		}
 	}
+	
+	public void clear() {
+		for (int row = 0; row < ntiles; row++) {
+			for (int col = 0; col < ntiles; col++) {
+				boardGrid[row][col].clear();;
+			}
+		}
+		playedTiles = 0;
+	}
 
 	public void setObserver(GameObserver GO) {
 		this.GO = GO;
@@ -47,26 +54,13 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		this.current = pb;
 	}
 
-	public void notify(boolean success) {
-		if (success) {
-			switch (turn) {
-			case W:
-				turn = Colors.R;
-				break;
-			case R:
-				turn = Colors.W;
-				break;
-			}
-		} else {
-			illegalMove = true;
-		}
-	}
-
 	public void playTile(BoardTile bt) {
 		if (current != null) {
 			if (playedTiles == 0 || testConformity(bt, current.tile)) {
 				bt.setTile(current.tile);
 				playedTiles++;
+				turn = turn.opposite();
+				GO.nextturn(turn);
 				isGameOver(bt);
 			}
 			current.setBorder(new LineBorder(Color.WHITE));
@@ -119,10 +113,14 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		if (playedTiles >= 4) {
 			for (Colors col : new Colors[] {turn, turn.opposite()}) {
 				Directions[] dir = bt.getPath(col);
-				int firstPath = dichotomyGO(bt, dir[0]);
-				int secondPath = dichotomyGO(bt, dir[1]);
-				if ((firstPath == -1 && secondPath == -1) 
-						|| (firstPath + secondPath + 1 >= 7)) {
+				int[] firstPath = dichotomyGO(bt, dir[0]);
+				int[] secondPath = dichotomyGO(bt, dir[1]);
+				
+				if ((firstPath.length == 0 && secondPath.length == 0) 
+						|| Math.max(firstPath[1], secondPath[1]) 
+						- Math.min(firstPath[0], secondPath[0]) >= 6
+						|| Math.max(firstPath[3], secondPath[3]) 
+						- Math.min(firstPath[2], secondPath[2]) >= 6) {
 					GO.win(col);
 					return;
 				}
@@ -130,27 +128,43 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver{
 		}
 	}
 
-	private int dichotomyGO(BoardTile bt, Directions dir) {
+	private int[] dichotomyGO(BoardTile bt, Directions dir) {
 		int[] coordinates = getCoordinates(bt);
 		int row = coordinates[0] + dir.motion(0);
 		int col = coordinates[1] + dir.motion(1);
-		int length = 0;
+
+		int minrow = coordinates[0];
+		int maxrow = coordinates[0];
+		int mincol = coordinates[1];
+		int maxcol = coordinates[1];
+
 		Directions nextDir = dir;
 		for ( ;; ) {
 			if (row >= 0 && row < ntiles && col >= 0 && col < ntiles) {
 				BoardTile nextTile = boardGrid[row][col];
 				if (nextTile.getModel() != null) {
+					if (row < minrow) {
+						minrow = row;
+					} else if (row > maxrow) {
+						maxrow = row;
+					}
+
+					if (col < mincol) {
+						mincol = col;
+					} else if (col > maxcol) {
+						maxcol = col;
+					}
+					
 					nextDir = nextTile.getPath(nextDir.opposite());
 					row += nextDir.motion(0);
 					col += nextDir.motion(1);
 					if (Arrays.equals(new int[] {row, col}, coordinates)) {
-						return -1;
+						return new int[0];
 					}
-					length ++;
 					continue;
 				}
 			}
-			return length;
+			return new int[] {minrow, maxrow, mincol, maxcol};
 		}
 	}
 }

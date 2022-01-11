@@ -23,13 +23,4 @@ class Board extends JPanel {
 			}
 		}
 	}
-
-	void clear() {
-		for (int row = 0; row < ntiles; row++) {
-			for (int col = 0; col < ntiles; col++) {
-				buttonGrid[row][col].tile.clear();
-			}
-		}
-		repaint();
-	}
 }
