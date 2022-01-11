@@ -4,8 +4,10 @@ import javax.swing.JOptionPane;
 public class Game {
 	private static GameBoard GB;
 	
-	private Game() {}
-
+	public static void main(String[] args) {
+		launch();
+	}
+	
 	public static boolean launch() {
 		int size = 8;
 		boolean err = true;
