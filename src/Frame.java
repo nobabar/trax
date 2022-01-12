@@ -22,7 +22,7 @@ public class Frame extends JPanel implements GameObserver {
     final BoardButton[][] boardGrid; // grid of the game board buttons
     final PanelButton[][] panelGrid; // grid of the game panel buttons
 
-    final JLabel turnLabel = new JLabel("white player's turn");
+    JLabel turnLabel = new JLabel("white player's turn");
 
     /**
      * Switch the players' turn display, called from the game board.
@@ -35,6 +35,7 @@ public class Frame extends JPanel implements GameObserver {
         } else { // if no player is specified that mean it was an invalid move
             turnLabel.setText("invalid tile!");
         }
+        repaint();
     }
 
     /**
@@ -43,9 +44,17 @@ public class Frame extends JPanel implements GameObserver {
      * @param winner the winning player.
      */
     public void win(Colors winner) {
+        String message;
+        if (Game.getComputerPlayer() != null) {
+            message = winner == Colors.W ? "player" : "AI";
+        } else {
+            message = winner + " player";
+        }
+        message += " won!\nNew game?";
+
         String[] options = new String[]{"Yes", "No", "New board"};
         int response = JOptionPane.showOptionDialog(null,
-                winner + " player won!\nNew game?",
+                message,
                 "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
                 null, options, options[0]);
         switch (response) {
@@ -119,9 +128,11 @@ public class Frame extends JPanel implements GameObserver {
         helperPanelClear.add(clear);
         superBox.add(helperPanelClear); // need to wrap the button in a panel to preserve its dimensions
 
-        JPanel helperPanelLabel = new JPanel();
-        helperPanelLabel.add(turnLabel);
-        superBox.add(helperPanelLabel);// need to wrap the label in a panel to preserve its dimensions
+        if (Game.getComputerPlayer() == null) {
+            JPanel helperPanelLabel = new JPanel();
+            helperPanelLabel.add(turnLabel);
+            superBox.add(helperPanelLabel);// need to wrap the label in a panel to preserve its dimensions
+        }
 
         mainPanel.add(superBox, BorderLayout.EAST);
         this.add(mainPanel, BorderLayout.CENTER);
