@@ -1,4 +1,7 @@
+/**
+ * Interface between game board and frame.
+ */
 public interface GameObserver {
-	void nextturn(Colors player);
-	void win(Colors winner);
+	void nextTurn(Colors player); // indicates players' turn
+	void win(Colors winner); // indicates game over
 }

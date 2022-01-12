@@ -4,21 +4,21 @@ import java.awt.GridLayout;
 import javax.swing.JPanel;
 
 class Board extends JPanel {
-	BoardButton[][] buttonGrid;
-	int ntiles;
+	final BoardButton[][] buttonGrid;
+	final int nTiles;
 
 	public static final long serialVersionUID = 2151184L;
 
-	public Board(BoardButton[][] boardGrid, int tilesize) {
+	public Board(BoardButton[][] boardGrid, int tileSize) {
 		this.buttonGrid = boardGrid;
-		this.ntiles = boardGrid.length;
-		int side = ntiles*tilesize;
+		this.nTiles = boardGrid.length;
+		int side = nTiles*tileSize;
 
 		this.setPreferredSize(new Dimension(side, side));
-		this.setLayout(new GridLayout(ntiles, ntiles));
+		this.setLayout(new GridLayout(nTiles, nTiles));
 
-		for (int row = 0; row < ntiles; row++) {
-			for (int col = 0; col < ntiles; col++) {				
+		for (int row = 0; row < nTiles; row++) {
+			for (int col = 0; col < nTiles; col++) {
 				this.add(boardGrid[row][col]);
 			}
 		}
