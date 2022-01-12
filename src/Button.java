@@ -1,15 +1,17 @@
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
+
+import javax.imageio.ImageIO;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Define general buttons' method and how to display the tiles on them.
@@ -67,7 +69,7 @@ abstract class Button extends JButton{
 				case CURVE -> curve;
 			};
 
-			g2.rotate(Math.toRadians(rotation), cSize/2, cSize/2); // rotation around the button's center
+			g2.rotate(Math.toRadians(rotation), (double) cSize/2, (double) cSize/2); // rotation around the button's center
 			g2.drawImage(image, 0, 0, cSize, cSize, null); // adapt the image size to button's size
 		}
 	}

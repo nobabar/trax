@@ -1,8 +1,14 @@
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JLabel;
+
+import java.awt.Desktop;
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.io.IOException;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 

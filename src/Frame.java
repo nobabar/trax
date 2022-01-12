@@ -6,8 +6,12 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Toolkit;
+import java.awt.Dimension;
+import java.awt.Color;
 
 /**
  * The main user interface, defined the graphics components and arrange them.
