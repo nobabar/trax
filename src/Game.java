@@ -31,7 +31,7 @@ public class Game {
                 boolean err = true;
                 do {
                     try{
-                        String input = JOptionPane.showInputDialog(null, "Enter game board size (between 8 and 24) :");
+                        String input = JOptionPane.showInputDialog(null, "Enter game board size (between 8 and 24) :", "Trax");
                         if (input == null || input.length() == 0) {
                             System.exit(0);
                         }

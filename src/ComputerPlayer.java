@@ -11,6 +11,7 @@ class SimpleComputerPlayer extends ComputerPlayer {
 
     public void ComputerMove(GameBoard GB, BoardTile bt) {
         int[] coordinates = GB.getCoordinates(bt);
+        BoardTile nextBt = null;
 
         for (Colors color : new Colors[]{Colors.R, Colors.W}) {
             Directions[] path = bt.getPath(color);
@@ -18,15 +19,15 @@ class SimpleComputerPlayer extends ComputerPlayer {
                 int row = coordinates[0] + dir.motion(0);
                 int col = coordinates[1] + dir.motion(1);
                 if (row >= 0 && row < GB.nTiles && col >= 0 && col < GB.nTiles) {
-                    BoardTile nextBt = GB.boardGrid[row][col];
+                    nextBt = GB.boardGrid[row][col];
                     if (nextBt.getModel() == null) {
-                        Integer[] intArray = { 1, 2, 3, 4, 5, 6};
+                        Integer[] intArray = {1, 2, 3, 4, 5, 6};
                         List<Integer> intList = Arrays.asList(intArray);
                         Collections.shuffle(intList);
                         intList.toArray(intArray);
                         for (int rand : intArray) {
                             TileModel TM = TileModel.values()[(rand > 2) ? 0 : 1];
-                            Directions orientation = Directions.values()[rand%4];
+                            Directions orientation = Directions.values()[rand % 4];
                             Tiles tile = new Tiles(TM, orientation);
                             if (GB.testConformity(nextBt, tile)) {
                                 GB.playTile(nextBt, tile);
@@ -37,6 +38,7 @@ class SimpleComputerPlayer extends ComputerPlayer {
                 }
             }
         }
+        ComputerMove(GB, nextBt);
     }
 }
 
