@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 import java.awt.Color;
 
 import javax.swing.border.LineBorder;
@@ -10,29 +8,13 @@ import javax.swing.border.LineBorder;
 public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
     GameObserver GO; // observation interface.
 
-    int nTiles;
-    BoardTile[][] boardGrid; // grid of the game board tiles
-    PanelTile[][] panelGrid; // grid of the lateral panel tiles
+    final int nTiles;
+    final PanelTile[][] panelGrid; // grid of the lateral panel tiles
+    final BoardGrid grid; // grid of the board tiles
     int playedTiles = 0;
 
     PanelButton current; // the selected tile from the lateral panel
     Colors turn = Colors.W; // color of the player whose turn it is
-
-    public GameBoard(GameBoard GB) {
-        this.boardGrid = new BoardTile[GB.nTiles][GB.nTiles];
-
-        for (int row = 0; row < GB.nTiles; row++) {
-            for (int col = 0; col < GB.nTiles; col++) {
-                if (GB.boardGrid[row][col].getModel() != null) {
-                    System.out.println("row"+row+"\ncol"+col);
-                    System.out.println(GB.boardGrid[row][col].getModel());
-                    boardGrid[row][col] = new BoardTile(GB.boardGrid[row][col]);
-                    System.out.println(boardGrid[row][col].getModel());
-                }
-                boardGrid[row][col] = new BoardTile();
-            }
-        }
-    }
 
     /**
      * Create a new board with n side tiles, all board are squares. Fill the two grids.
@@ -50,12 +32,10 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
         };
 
         this.nTiles = nTiles;
-        this.boardGrid = new BoardTile[nTiles][nTiles];
 
-        for (int row = 0; row < nTiles; row++) {
-            for (int col = 0; col < nTiles; col++) {
-                boardGrid[row][col] = new BoardTile(this);
-            }
+        grid = new BoardGrid(nTiles);
+        for (int row = 0; row < nTiles*nTiles; row++) {
+            grid.add(new BoardTile(this));
         }
     }
 
@@ -63,11 +43,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
      * Resets the game board and its tiles.
      */
     public void clear() {
-        for (int row = 0; row < nTiles; row++) {
-            for (int col = 0; col < nTiles; col++) {
-                boardGrid[row][col].clear();
-            }
-        }
+        grid.clear();
         playedTiles = 0;
     }
 
@@ -92,6 +68,14 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
         this.current = pb;
     }
 
+    public int[] getCoordinates(BoardTile bt) {
+        return grid.getCoordinates(bt);
+    }
+
+    public BoardTile getTile(int row, int col) {
+        return grid.getTile(row, col);
+    }
+
     /**
      * Play a new tile.
      *
@@ -99,10 +83,12 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
      */
     public void playTile(BoardTile bt) {
 		if (current != null) { // do nothing if no tile have been selected from the panel
-            if (playedTiles == 0 || testConformity(bt, current.tile)) { // check if you can play this tile here
+            if (playedTiles == 0 || grid.testConformity(bt, current.tile)) { // check if you can play this tile here
                 bt.setTile(current.tile);
                 playedTiles++;
-                GO.win(isGameOver(bt));
+                if (playedTiles >= 4) {
+                    GO.win(grid.isGameOver(bt, turn));
+                }
 				if (Game.getComputerPlayer() != null){
                     Game.getComputerPlayer().ComputerMove(this, bt);
 				}
@@ -125,140 +111,8 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
         playedTiles++;
         turn = turn.opposite(); // switch to next player
         GO.nextTurn(turn);
-        GO.win(isGameOver(bt));
-    }
-
-    /**
-     * Get the coordinates of a tile on the board.
-     *
-     * @param bt the tile we are searching for.
-     * @return the coordinates (row and column) of the tile.
-     */
-    public int[] getCoordinates(BoardTile bt) {
-        for (int row = 0; row < boardGrid.length; row++) {
-            for (int col = 0; col < boardGrid[0].length; col++) {
-                if (boardGrid[row][col] == bt) {
-                    return new int[]{row, col};
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Get the neighbor tile in a given direction, if there is any.
-     *
-     * @param coordinates position of the starting tile.
-     * @param dir         direction where to go.
-     * @return the neighbor tile.
-     */
-    private Tiles adjacentTile(int[] coordinates, Directions dir) {
-        int row = coordinates[0] + dir.motion(0);
-        int col = coordinates[1] + dir.motion(1);
-        if (row >= 0 && row < nTiles && col >= 0 && col < nTiles) { // check that we are not on the board sides
-            Tiles tile = boardGrid[row][col];
-            if (tile.getModel() != null) {
-                return tile;
-            }
-        }
-        return null; // this should never happen
-    }
-
-    /**
-     * Check that we can place that tile in the wished place.
-     *
-     * @param bt   the selected location.
-     * @param tile the tile to place.
-     * @return if the move is valid or not.
-     */
-    public boolean testConformity(BoardTile bt, Tiles tile) {
-        boolean conform = true;
-        boolean neighbor = false; // the tile must have at least one neighbor
-        int[] coordinates = getCoordinates(bt);
-        for (Directions dir : Directions.values()) {
-            Colors tileColor = tile.getColor(dir.ordinal());
-            assert coordinates != null; // this should never happen
-            Tiles neighborTile = adjacentTile(coordinates, dir);
-            if (neighborTile != null) {
-                neighbor = true;
-                Colors neighborColor = neighborTile.getColor(dir.opposite());
-                if (tileColor != neighborColor) {
-                    conform = false;
-                }
-            }
-        }
-        return (conform && neighbor);
-    }
-
-    /**
-     * Checks if the move played is a winning move.
-     *
-     * @param bt tile of the last played move.
-     */
-    public Colors isGameOver(BoardTile bt) {
-        if (playedTiles >= 4) { // no winning combination below 4 played tiles
-            for (Colors col : new Colors[]{turn, turn.opposite()}) { // test the current player color first
-                Directions[] dir = bt.getPath(col); // get the direction of the player color in the played tile
-                int[] firstPath = dichotomyGO(bt, dir[0]); // split the search in the two directions
-                int[] secondPath = dichotomyGO(bt, dir[1]);
-
-                if ((firstPath.length == 0 && secondPath.length == 0) // if we have a loop
-                        || Math.max(firstPath[1], secondPath[1])
-                        - Math.min(firstPath[0], secondPath[0]) >= 6 // if the path goes over 6 rows or more
-                        || Math.max(firstPath[3], secondPath[3])
-                        - Math.min(firstPath[2], secondPath[2]) >= 6) { // if the path goes over 6 columns or more
-                    return col;
-                }
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Follow the path from the starting tile and store the area occupied by this path.
-     *
-     * @param bt  the starting tile.
-     * @param dir the direction to follow.
-     * @return the coordinates of the rectangle's corners that is covered by the path.
-     */
-    private int[] dichotomyGO(BoardTile bt, Directions dir) {
-        int[] coordinates = getCoordinates(bt);
-        assert coordinates != null; // this should never happen
-        int row = coordinates[0] + dir.motion(0);
-        int col = coordinates[1] + dir.motion(1);
-
-        int minRow = coordinates[0];
-        int maxRow = coordinates[0];
-        int minCol = coordinates[1];
-        int maxCol = coordinates[1]; // start with a 1 by 1 rectangle around the starting tile
-
-        Directions nextDir = dir;
-        for (; ; ) { // loop as long as we have tiles ahead
-            if (row >= 0 && row < nTiles && col >= 0 && col < nTiles) { // check that we didn't hit the sides
-                BoardTile nextTile = boardGrid[row][col];
-                if (nextTile.getModel() != null) { // check that we have a tile ahead
-                    if (row < minRow) { // expend the rectangle rows
-                        minRow = row;
-                    } else if (row > maxRow) {
-                        maxRow = row;
-                    }
-
-                    if (col < minCol) { // expend the rectangle columns
-                        minCol = col;
-                    } else if (col > maxCol) {
-                        maxCol = col;
-                    }
-
-                    nextDir = nextTile.getPath(nextDir.opposite());
-                    row += nextDir.motion(0);
-                    col += nextDir.motion(1);
-                    if (Arrays.equals(new int[]{row, col}, coordinates)) { // if we looped back to the starting tile
-                        return new int[0];
-                    }
-                    continue;
-                }
-            }
-            return new int[]{minRow, maxRow, minCol, maxCol};
+        if (playedTiles >= 4) {
+            GO.win(grid.isGameOver(bt, turn));
         }
     }
 }

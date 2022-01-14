@@ -90,7 +90,7 @@ public class Frame extends JPanel implements GameObserver {
         for (int row = 0; row < nBoardTiles; row++) {
             for (int col = 0; col < nBoardTiles; col++) {
                 BoardButton button = new BoardButton(BoardButtonSize, // create a button for each location of the board
-                        GB.boardGrid[row][col], GB);
+                        GB.getTile(row, col), GB);
                 boardGrid[row][col] = button;
             }
         }

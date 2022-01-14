@@ -38,12 +38,12 @@ public class Game {
                         }
                         size = Integer.parseInt(input);
                         err = false;
-                    }catch(NumberFormatException ignored) {}
+                    } catch(NumberFormatException ignored) {}
                 } while (err || size < 8 || size > 24); // loop over again if no size is specified or if it is incorrect
 				GB = new GameBoard(size);
             }
             case 1 -> cp = new SimpleComputerPlayer();
-			case 2 -> cp = new WeightedComputerPlayer();
+			case 2 -> cp = new ComplexComputerPlayer();
 		}
 		GB = new GameBoard(size);
 

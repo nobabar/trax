@@ -113,6 +113,12 @@ public class Tiles {
 		}
 		return sideList.toArray(new Directions[0]);
 	}
+
+	public String toString() {
+		return "--"+colArray()[0]+"--\n"+
+				colArray()[3]+"---"+colArray()[1]+"\n"+
+				"--"+colArray()[2]+"--";
+	}
 }
 
 class PanelTile extends Tiles {
