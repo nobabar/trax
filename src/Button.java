@@ -50,7 +50,7 @@ abstract class Button extends JButton{
 
 		if (tile.getModel() != null) {
 			int rotation = 0;
-			switch (tile.getOrientation()) { // display the button's tile with correct rotation
+			switch (tile.getOrientationInt()) { // display the button's tile with correct rotation
 			case 0:
 				break;
 			case 1:

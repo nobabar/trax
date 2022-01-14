@@ -55,10 +55,10 @@ public class Tiles {
 		return this.model;
 	}
 	
-	public int getOrientation() {
-		return this.orientation.ordinal();
-	}
-	
+	public Directions getOrientation() { return this.orientation; }
+
+	public int getOrientationInt() { return this.orientation.ordinal(); }
+
 	public void clear() {
 		this.model = null;
 	}
@@ -127,8 +127,18 @@ class PanelTile extends Tiles {
 class BoardTile extends Tiles {
 	final BoardButtonObserver bbo;
 
+	public BoardTile() {
+		super (); // board tile are empty at first
+		this.bbo = null;
+	}
+
 	public BoardTile(BoardButtonObserver bbo) {
 		super (); // board tile are empty at first
 		this.bbo = bbo;
+	}
+
+	public BoardTile(BoardTile bt) {
+		super (bt.getModel(), bt.getOrientation()); // board tile are empty at first
+		this.bbo = bt.bbo;
 	}
 }

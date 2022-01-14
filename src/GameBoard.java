@@ -10,13 +10,29 @@ import javax.swing.border.LineBorder;
 public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
     GameObserver GO; // observation interface.
 
-    final int nTiles;
-    final BoardTile[][] boardGrid; // grid of the game board tiles
-    final PanelTile[][] panelGrid; // grid of the lateral panel tiles
+    int nTiles;
+    BoardTile[][] boardGrid; // grid of the game board tiles
+    PanelTile[][] panelGrid; // grid of the lateral panel tiles
     int playedTiles = 0;
 
     PanelButton current; // the selected tile from the lateral panel
     Colors turn = Colors.W; // color of the player whose turn it is
+
+    public GameBoard(GameBoard GB) {
+        this.boardGrid = new BoardTile[GB.nTiles][GB.nTiles];
+
+        for (int row = 0; row < GB.nTiles; row++) {
+            for (int col = 0; col < GB.nTiles; col++) {
+                if (GB.boardGrid[row][col].getModel() != null) {
+                    System.out.println("row"+row+"\ncol"+col);
+                    System.out.println(GB.boardGrid[row][col].getModel());
+                    boardGrid[row][col] = new BoardTile(GB.boardGrid[row][col]);
+                    System.out.println(boardGrid[row][col].getModel());
+                }
+                boardGrid[row][col] = new BoardTile();
+            }
+        }
+    }
 
     /**
      * Create a new board with n side tiles, all board are squares. Fill the two grids.
@@ -38,8 +54,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
 
         for (int row = 0; row < nTiles; row++) {
             for (int col = 0; col < nTiles; col++) {
-                BoardTile bt = new BoardTile(this);
-                boardGrid[row][col] = bt;
+                boardGrid[row][col] = new BoardTile(this);
             }
         }
     }
@@ -87,12 +102,12 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
             if (playedTiles == 0 || testConformity(bt, current.tile)) { // check if you can play this tile here
                 bt.setTile(current.tile);
                 playedTiles++;
-				isGameOver(bt);
+                GO.win(isGameOver(bt));
 				if (Game.getComputerPlayer() != null){
                     Game.getComputerPlayer().ComputerMove(this, bt);
 				}
                 turn = turn.opposite(); // switch to next player
-                GO.nextTurn(null);
+                GO.nextTurn(turn);
             }
             current.setBorder(new LineBorder(Color.WHITE));
             current = null;
@@ -110,7 +125,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
         playedTiles++;
         turn = turn.opposite(); // switch to next player
         GO.nextTurn(turn);
-        isGameOver(bt);
+        GO.win(isGameOver(bt));
     }
 
     /**
@@ -180,7 +195,7 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
      *
      * @param bt tile of the last played move.
      */
-    private void isGameOver(BoardTile bt) {
+    public Colors isGameOver(BoardTile bt) {
         if (playedTiles >= 4) { // no winning combination below 4 played tiles
             for (Colors col : new Colors[]{turn, turn.opposite()}) { // test the current player color first
                 Directions[] dir = bt.getPath(col); // get the direction of the player color in the played tile
@@ -192,11 +207,11 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
                         - Math.min(firstPath[0], secondPath[0]) >= 6 // if the path goes over 6 rows or more
                         || Math.max(firstPath[3], secondPath[3])
                         - Math.min(firstPath[2], secondPath[2]) >= 6) { // if the path goes over 6 columns or more
-                    GO.win(col);
-                    return;
+                    return col;
                 }
             }
         }
+        return null;
     }
 
     /**

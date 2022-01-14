@@ -44,28 +44,30 @@ public class Frame extends JPanel implements GameObserver {
      * @param winner the winning player.
      */
     public void win(Colors winner) {
-        String message;
-        if (Game.getComputerPlayer() != null) {
-            message = winner == Colors.W ? "player" : "AI";
-        } else {
-            message = winner + " player";
-        }
-        message += " won!\nNew game?";
-
-        String[] options = new String[]{"Yes", "No", "New board"};
-        int response = JOptionPane.showOptionDialog(null,
-                message,
-                "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options, options[0]);
-        switch (response) {
-            case 0 -> {
-                Game.clear(); // only cleans the board if players want a new game
-                repaint();
+        if (winner != null) {
+            String message;
+            if (Game.getComputerPlayer() != null) {
+                message = winner == Colors.W ? "player" : "AI";
+            } else {
+                message = winner + " player";
             }
-            case 1 -> System.exit(0); // close the application
-            case 2 -> {
-                SwingUtilities.getWindowAncestor(this).dispose(); // dispose this board
-                Game.launch(); // and create a new one
+            message += " won!\nNew game?";
+
+            String[] options = new String[]{"Yes", "No", "New board"};
+            int response = JOptionPane.showOptionDialog(null,
+                    message,
+                    "Game Over", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                    null, options, options[0]);
+            switch (response) {
+                case 0 -> {
+                    Game.clear(); // only cleans the board if players want a new game
+                    repaint();
+                }
+                case 1 -> System.exit(0); // close the application
+                case 2 -> {
+                    SwingUtilities.getWindowAncestor(this).dispose(); // dispose this board
+                    Game.launch(); // and create a new one
+                }
             }
         }
     }
