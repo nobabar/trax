@@ -1,4 +1,3 @@
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,8 +44,12 @@ abstract class Button extends JButton{
 		this.setBorder(new LineBorder(Color.WHITE));
 	}
 
-	protected void paintComponent (Graphics g) { // overrides how are button displayed
-		Graphics2D g2 = (Graphics2D)g.create();
+	/**
+	 * Overrides how are button displayed.
+	 * @param g what to display.
+	 */
+	protected void paintComponent (Graphics g) {
+		Graphics2D g2 = (Graphics2D) g.create();
 
 		if (tile.getModel() != null) {
 			int rotation = 0;
@@ -72,54 +75,5 @@ abstract class Button extends JButton{
 			g2.rotate(Math.toRadians(rotation), (double) cSize/2, (double) cSize/2); // rotation around the button's center
 			g2.drawImage(image, 0, 0, cSize, cSize, null); // adapt the image size to button's size
 		}
-	}
-}
-
-/**
- * Buttons from the panel.
- */
-class PanelButton extends Button {
-	public static final long serialVersionUID = 1611451222120201514L;
-	
-	final PanelButtonObserver pbo; // observation interface
-
-	/**
-	 * @param cSize button's size.
-	 * @param pt button's tile.
-	 * @param pbo observation interface to set the select panel button.
-	 */
-	public PanelButton(int cSize, PanelTile pt, PanelButtonObserver pbo) {
-		super (pt, cSize);
-		this.pbo = pbo;
-		ActionListener al = e -> {
-			pbo.setCurrent(PanelButton.this); // set current tile when pressed
-			PanelButton.this.setBorder(new LineBorder(Color.RED));
-		};
-		this.addActionListener(al);
-	}
-}
-
-/**
- * Buttons from the board.
- */
-class BoardButton extends Button {
-	public static final long serialVersionUID = 20912522120201514L;
-	
-	final BoardButtonObserver tbo; // observation interface
-
-	/**
-	 * @param cSize button's size.
-	 * @param bt button's tile.
-	 * @param tbo observation interface to play tiles.
-	 */
-	public BoardButton(int cSize, BoardTile bt, BoardButtonObserver tbo) {
-		super (bt, cSize);
-		this.tbo = tbo;
-		ActionListener al = e -> {
-			if(bt.getModel() == null) {
-				tbo.playTile(bt); // play tile here when pressed
-			}
-		};
-		this.addActionListener(al);
 	}
 }

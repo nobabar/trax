@@ -68,10 +68,21 @@ public class GameBoard implements PanelButtonObserver, BoardButtonObserver {
         this.current = pb;
     }
 
+    /**
+     * Get the coordinates of a tile in the board.
+     * @param bt the tile we are searching for.
+     * @return an array of the coordinates (row, col).
+     */
     public int[] getCoordinates(BoardTile bt) {
         return grid.getCoordinates(bt);
     }
 
+    /**
+     * Retrieve a tile from its coordinates.
+     * @param row tiles' row.
+     * @param col tiles' column.
+     * @return the wanted tile.
+     */
     public BoardTile getTile(int row, int col) {
         return grid.getTile(row, col);
     }

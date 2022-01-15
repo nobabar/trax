@@ -50,22 +50,35 @@ public class Tiles {
 		this.model = tile.model;
 		this.orientation = tile.orientation;
 	}
-	
+
+	/**
+	 * @return the model of a tile.
+	 */
 	public TileModel getModel() {
 		return this.model;
 	}
-	
+
+	/**
+	 * @return the direction of the tile's north.
+	 */
 	public Directions getOrientation() { return this.orientation; }
 
+	/**
+	 * @return the orientation of the tile's north.
+	 */
 	public int getOrientationInt() { return this.orientation.ordinal(); }
 
+	/**
+	 * Resets a tile's model.
+	 */
 	public void clear() {
 		this.model = null;
 	}
-	
-	public Colors[] colArray() {
-		return model.colArray(this.orientation);
-	}
+
+	/**
+	 * @return the array representing the tile, in the correct orientation.
+	 */
+	public Colors[] colArray() { return model.colArray(this.orientation); }
 
 	/**
 	 * Get the color of a side.
@@ -114,37 +127,13 @@ public class Tiles {
 		return sideList.toArray(new Directions[0]);
 	}
 
+	/**
+	 * Print the tile in the terminal, was used in debugging phase.
+	 * @return a string representing the tile.
+	 */
 	public String toString() {
 		return "--"+colArray()[0]+"--\n"+
 				colArray()[3]+"---"+colArray()[1]+"\n"+
 				"--"+colArray()[2]+"--";
-	}
-}
-
-class PanelTile extends Tiles {
-	final PanelButtonObserver pbo;
-	
-	public PanelTile(TileModel model, Directions dir, PanelButtonObserver pbo) {
-		super (model, dir);
-		this.pbo = pbo;
-	}
-}
-
-class BoardTile extends Tiles {
-	final BoardButtonObserver bbo;
-
-	public BoardTile() {
-		super (); // board tile are empty at first
-		this.bbo = null;
-	}
-
-	public BoardTile(BoardButtonObserver bbo) {
-		super (); // board tile are empty at first
-		this.bbo = bbo;
-	}
-
-	public BoardTile(BoardTile bt) {
-		super (bt.getModel(), bt.getOrientation()); // board tile are empty at first
-		this.bbo = bt.bbo;
 	}
 }

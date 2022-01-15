@@ -1,7 +1,10 @@
 import java.util.Arrays;
 
+/**
+ * The tile grid of the board game, with all functions related to this grid.
+ */
 public class BoardGrid {
-    private final BoardTile[][] grid;
+    private final BoardTile[][] grid; // the grid
     int nTiles;
     int row = 0;
     int col = 0;
@@ -19,6 +22,10 @@ public class BoardGrid {
         }
     }
 
+    /**
+     * Used to instantiate the grid, add tiles row by row.
+     * @param tile a board tile.
+     */
     public void add(BoardTile tile) {
         try {
             grid[row][col] = tile;
@@ -28,10 +35,19 @@ public class BoardGrid {
         }
     }
 
+    /**
+     * Retrieve a tile from its position in the board.
+     * @param row tile's row.
+     * @param col tile's column.
+     * @return the tile in question.
+     */
     public BoardTile getTile(int row, int col) {
         return grid[row][col];
     }
 
+    /**
+     * keep the current board but resets the tiles on it.
+     */
     public void clear() {
         for (int row = 0; row < nTiles; row++) {
             for (int col = 0; col < nTiles; col++) {
@@ -61,7 +77,7 @@ public class BoardGrid {
      * Get the neighbor tile in a given direction, if there is any.
      *
      * @param coordinates position of the starting tile.
-     * @param dir         direction where to go.
+     * @param dir direction where to go.
      * @return the neighbor tile.
      */
     private Tiles adjacentTile(int[] coordinates, Directions dir) {
