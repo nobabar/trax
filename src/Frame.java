@@ -119,7 +119,7 @@ public class Frame extends JPanel implements GameObserver {
         superBox.add(p);
 
         JButton clear = new JButton("clear");
-        clear.setPreferredSize(new Dimension(80, 40));
+        clear.setPreferredSize(new Dimension(100, 30));
         ActionListener clearAL = e -> {
             Game.clear(); // resets the game board
             repaint();
@@ -129,6 +129,18 @@ public class Frame extends JPanel implements GameObserver {
         JPanel helperPanelClear = new JPanel();
         helperPanelClear.add(clear);
         superBox.add(helperPanelClear); // need to wrap the button in a panel to preserve its dimensions
+
+        JButton newBoard = new JButton("new board");
+        newBoard.setPreferredSize(new Dimension(100, 30));
+        ActionListener createNew = e -> {
+            SwingUtilities.getWindowAncestor(this).dispose(); // dispose this board
+            Game.launch(); // and create a new one
+        };
+        newBoard.addActionListener(createNew);
+
+        JPanel helperPanelNew = new JPanel();
+        helperPanelNew.add(newBoard);
+        superBox.add(helperPanelNew); // need to wrap the button in a panel to preserve its dimensions
 
         if (Game.getComputerPlayer() == null) {
             JPanel helperPanelLabel = new JPanel();

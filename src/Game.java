@@ -18,7 +18,8 @@ public class Game {
      * Launch a new game, with a new game board.
      */
     public static void launch() {
-        String[] options = new String[]{"2 players", "Dummy", "Computer"};
+        // String[] options = new String[]{"2 players", "Dummy", "Computer"};
+        String[] options = new String[]{"2 players", "Dummy"}; // Computer not working yet
         int response = JOptionPane.showOptionDialog(null,
                 "Welcome to trax game!",
                 "Trax", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
