@@ -130,7 +130,7 @@ public class Frame extends JPanel implements GameObserver {
         helperPanelClear.add(clear);
         superBox.add(helperPanelClear); // need to wrap the button in a panel to preserve its dimensions
 
-        JButton newBoard = new JButton("new board");
+        JButton newBoard = new JButton("new game");
         newBoard.setPreferredSize(new Dimension(100, 30));
         ActionListener createNew = e -> {
             SwingUtilities.getWindowAncestor(this).dispose(); // dispose this board
