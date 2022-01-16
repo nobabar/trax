@@ -25,8 +25,8 @@ abstract class Button extends JButton{
 	static BufferedImage curve;
 	static {
 		try {
-			cross = ImageIO.read(new File(".\\img\\tile_cross.gif")); // load the image for the cross tile
-			curve = ImageIO.read(new File(".\\img\\tile_curve.gif")); // load the image for the curve tile
+			cross = ImageIO.read(new File("./img/tile_cross.gif")); // load the image for the cross tile
+			curve = ImageIO.read(new File("./img/tile_curve.gif")); // load the image for the curve tile
 		} catch (IOException ignored) {} // This should never happen
 	}
 
